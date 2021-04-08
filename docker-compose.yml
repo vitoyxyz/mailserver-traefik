@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  mailserver:
+    image: docker.io/mailserver/docker-mailserver:latest
+    hostname: ${HOSTNAME}
+    domainname: ${DOMAINNAME}
+    container_name: ${CONTAINER_NAME}
+    env_file: mailserver.env
+    # To avoid conflicts with yaml base-60 float, DO NOT remove the quotation marks.
+    environment:
+       SSL_TYPE: letsencrypt
+
+    ports:
+      - "25:25"
+      - "143:143"
+      - "587:587"
+      - "993:993"
+    volumes:
+      - maildata:/var/mail
+      - mailstate:/var/mail-state
+      - maillogs:/var/log/mail
+      - /etc/localtime:/etc/localtime:ro
+      - ./config/:/tmp/docker-mailserver/
+      - /home/user/traefik-portainer/traefik-data/acme.json:/etc/letsencrypt/acme.json:ro # edit traefik acme.json
+    restart: always
+    cap_add: [ "NET_ADMIN", "SYS_PTRACE" ]
+
+  whoami:
+    image: containous/whoami
+    labels:
+    - "traefik.http.routers.whoami.rule=Host(`mail.example.com`)"
+
+    labels:
+      - traefik.enable=true
+      - traefik.protocol=http
+      - traefik.docker.network=proxy
+      - traefik.http.routers.mail.tls=true
+      - traefik.http.routers.mail.entrypoints=websecure
+      - traefik.http.routers.mail.tls.certresolver=letsencrypt
+      - traefik.http.routers.mail.rule=Host(`mail.domain.com`)
+volumes:
+  maildata:
+  mailstate:
+  maillogs:
