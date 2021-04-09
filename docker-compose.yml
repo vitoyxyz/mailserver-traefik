@@ -1,5 +1,8 @@
-version: '3.8'
+version: "3.8"
 
+networks:
+  proxy:
+    external: true
 services:
   mailserver:
     image: docker.io/mailserver/docker-mailserver:latest
@@ -8,9 +11,10 @@ services:
     container_name: ${CONTAINER_NAME}
     env_file: mailserver.env
     # To avoid conflicts with yaml base-60 float, DO NOT remove the quotation marks.
+    networks:
+      - proxy
     environment:
-       SSL_TYPE: letsencrypt
-
+      SSL_TYPE: letsencrypt
     ports:
       - "25:25"
       - "143:143"
@@ -24,7 +28,7 @@ services:
       - ./config/:/tmp/docker-mailserver/
       - /path/to/trafik/acme.json:/etc/letsencrypt/acme.json:ro # edit traefik acme.json
     restart: always
-    cap_add: [ "NET_ADMIN", "SYS_PTRACE" ]
+    cap_add: ["NET_ADMIN", "SYS_PTRACE"]
 
   whoami:
     image: containous/whoami

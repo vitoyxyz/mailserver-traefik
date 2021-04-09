@@ -51,6 +51,20 @@ services:
     ...
 ```
 
+### 4. You edit the network name to your traefik network name
+
+```yml
+networks:
+    proxy:  #this
+        external: true
+...
+services:
+    mailserver:
+        ...
+        networks:
+            - proxy #this
+```
+
 ### Running the stuck
 
 First the the correct shell script version that is used for managing the mail server/container
@@ -93,8 +107,6 @@ If you want to see detailed usage information, run `./setup.sh config dkim help`
 #### DNS - DKIM
 
 When keys are generated, you can configure your DNS server by just pasting the content of `config/opendkim/keys/domain.com/mail.txt` to [set up DKIM](https://mxtoolbox.com/dmarc/dkim/setup/how-to-setup-dkim). See the [documentation](https://docker-mailserver.github.io/docker-mailserver/edge/config/best-practices/dkim/) for more details.
-
-
 
 #### Restart the container and start it again(For Postfix you to create atleast one email account first to start working correctly)
 
