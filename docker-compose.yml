@@ -22,15 +22,12 @@ services:
       - maillogs:/var/log/mail
       - /etc/localtime:/etc/localtime:ro
       - ./config/:/tmp/docker-mailserver/
-      - /home/user/traefik-portainer/traefik-data/acme.json:/etc/letsencrypt/acme.json:ro # edit traefik acme.json
+      - /path/to/trafik/acme.json:/etc/letsencrypt/acme.json:ro # edit traefik acme.json
     restart: always
     cap_add: [ "NET_ADMIN", "SYS_PTRACE" ]
 
   whoami:
     image: containous/whoami
-    labels:
-    - "traefik.http.routers.whoami.rule=Host(`mail.example.com`)"
-
     labels:
       - traefik.enable=true
       - traefik.protocol=http
